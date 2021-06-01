@@ -1,27 +1,47 @@
-# AngularTinymceDemo
+# angular-tinymce-demo
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.2.
 
-## Development server
+## What was done to use self-hosted TinyMCE 5
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Please refer to the [official documentation](https://www.tiny.cloud/docs/integrations/angular/)!
 
-## Code scaffolding
+- Added `@tinymce/tinymce-angular` and `tinymce` as dependencies in `package.json`
+    - `@tinymce/tinymce-angular` for the Angular related stuff
+    - `tinymce` to self host the TinyMCE library
+- Updated `angular.json` to treat `node_modules/tinymce` as asset (basically copy-pasting it over during build)
+    - I used `assets/tinymce`, but anything else should be fine
+    - Offical docs recommends `/tinymce`
+- Import `EditorModule`, and manually provide `TINYMCE_SCRIPT_SRC`, based on the path configured in `angular.json`
+    - If left blank, TinyMCE will load the cloud version
+- Use `<editor>` in the template
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Questions?
 
-## Build
+1. **Are you a lawyer?**
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+    No. Don't really like legalese either. All I did was read the [tl;dr version](https://tldrlegal.com/license/gnu-lesser-general-public-license-v2.1-(lgpl-2.1)), and the [TinyMCE blog post](https://www.tiny.cloud/blog/tinymce-free-wysiwyg-html-editor/).
 
-## Running unit tests
+1. **Why don't we just import the TinyMCE library into the project?**
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+    > If the software is statically linked (i.e. compiled into) your work, you must release object code or source code such that the user can modify the library. If otherwise (dynamically linked), you must make the source for the library available.
 
-## Running end-to-end tests
+    So it really depends on the nature of the project. I'm considering TinyMCE for a closed-source, commercial project, so "dynamic link" is the way to go.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+1. **Can I cache-bust/version the TinyMCE library?**
 
-## Further help
+    Probably... But according to GNU LGPL v2.1, "must either include the original source code or link clearly to a way to obtain it".
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+    Cache busting certainly does not modify the file, but I am not sure. We can also cache bust it via the folder name in `angular.json`, but that's manual work.
+
+1. **Can I trim out unneeded TinyMCE files in `angular.json`?**
+
+    Not recommended. Again, "must either include the original source code or link clearly to a way to obtain it".
+
+    Removing the files _might_ fall under "changes made to software", which requires us to state the changes somewhere.
+
+    And also, the original license from TinyMCE needs to be preserved.
+
+1. **File size concerns?**
+
+    The whole TinyMCE folder copied over will be around 7.7MB in size. Although not everything inside is used.
